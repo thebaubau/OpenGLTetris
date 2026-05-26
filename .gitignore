@@ -1,0 +1,29 @@
+# Claude
+CLAUDE.md
+.claude/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Build output
+x64/
+Debug/
+Release/
+Tetris/x64/
+
+# Compiled objects
+*.obj
+*.ilk
+*.pdb
+*.idb
+*.tlog
+
+# Binaries
+*.exe
+
+# Precompiled headers
+*.ipch
