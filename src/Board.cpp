@@ -144,7 +144,6 @@ bool Board::CanMove(TetrominoMove dir)
 		}
 		break;
 	
-	// Right wall
 	case TetrominoMove::RIGHT:
 		for (int i = 0; i < m_ActiveTetromino->m_Height; ++i) {
 			for (int j = m_ActiveTetromino->m_Width - 1; j >= 0; --j) {
@@ -173,6 +172,7 @@ bool Board::CanMove(TetrominoMove dir)
 				{
 					LockTetromino();
 					m_ActiveTetromino->m_Active = false;
+					CheckLines();
 
 					return false;
 				}
@@ -201,7 +201,7 @@ bool Board::IntersectsWithSettled(Tetromino tetromino)
 {
 	for (int i{ 0 }; i < tetromino.m_Width; ++i) {
 		for (int j{ 0 }; j < tetromino.m_Width; ++j) {
-			if (tetromino.m_TetrominoData[i][j] == 1)
+			if (tetromino.m_TetrominoData[i][j] == 0)
 				continue;
 			if (tetromino.m_RowPos + i > m_Board.size() - 1)
 				return true;
@@ -210,6 +210,38 @@ bool Board::IntersectsWithSettled(Tetromino tetromino)
 		}
 	}
 	return false;
+}
+
+void Board::CheckLines()
+{
+	int settledValue = 2;
+	int numOfLinesScored = 0;
+
+	for (int i{ (int)m_Board.size() - 1 }; i > 0; i--) {
+		if (std::all_of(m_Board[i].begin(), m_Board[i].end(), [settledValue](int n) { return n == settledValue; })) {
+			numOfLinesScored++;
+			ShiftBoardDown(i);
+			i++;
+		}
+	}
+
+	if (numOfLinesScored == 0) return;
+
+	UpdateScore(numOfLinesScored);
+}
+
+void Board::ShiftBoardDown(int row)
+{
+	for (int r = 0 + row; r > 0; --r) {
+		m_Board[r] = m_Board[r - 1];
+	}
+
+	std::fill(m_Board[0].begin(), m_Board[0].end(), 0);
+}
+
+void Board::UpdateScore(int lines)
+{
+	m_BoardScore += m_Scores.at(lines);
 }
 
 void Board::PrintBoard()
