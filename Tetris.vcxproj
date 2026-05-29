@@ -138,6 +138,7 @@
     <ClInclude Include="src\Tetris.h" />
     <ClInclude Include="src\Tetromino.h" />
     <ClInclude Include="src\TetrominoDataLoader.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\glad.c" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\Tetris.cpp" />
     <ClCompile Include="src\Tetromino.cpp" />
     <ClCompile Include="src\TetrominoDataLoader.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

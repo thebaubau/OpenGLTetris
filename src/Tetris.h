@@ -5,7 +5,6 @@
 #include <iostream>
 #include "Shader.h"
 #include "Board.h"
-#include "Tetromino.h"
 
 enum GameState {
 	GAME_ACTIVE,
