@@ -10,7 +10,7 @@ public:
 	Texture(std::string path, std::string type = "Diffuse");
 	~Texture();
 
-	void Bind(unsigned int slot);
+	void Bind(unsigned int slot = 0);
 	void Unbind();
 
 	std::string m_FilePath;

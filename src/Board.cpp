@@ -1,18 +1,55 @@
 #include "Board.h"
 
 Board::Board()
-	: m_Board(20, std::vector<int>(10, 0))
+	: m_Board(20, std::vector<Cell>(10))
 {
 	std::cout << "Constructing board" << std::endl;
 
+	tOne = std::make_shared<Texture>("res\\textures\\block_sprite.png");
+	m_Proj = glm::ortho(0.0f, (float)10, (float)20, 0.0f, -1.0f, 1.0f);
+
 	// Loading all tetromino data
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_ll.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_i.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_z.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_s.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt")));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt")));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_ll.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_i.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_z.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_s.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), tOne));
+
+
+	float triVertices[] = {
+		// positions        // texture coords
+		 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,   // top right
+		 1.0f,  0.0f, 0.0f, 1.0f, 0.0f,   // bottom right
+		 0.0f,  0.0f, 0.0f, 0.0f, 0.0f,   // bottom left
+		 0.0f,  1.0f, 0.0f, 0.0f, 1.0f    // top left 
+	};
+
+	unsigned int indices[] = {
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+	};
+
+	glGenBuffers(1, &m_VBO);
+	glGenBuffers(1, &m_EBO);
+	glGenVertexArrays(1, &m_VAO);
+
+	glBindVertexArray(m_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 Board::~Board()
@@ -51,13 +88,13 @@ void Board::DrawBoard() {
 
 	if (m_ActiveTetromino->m_Active == false) return;
 
+	int boardRowSize = m_Board.size() - 1;
+	int boardColSize = m_Board[0].size() - 1;
+
 	for (int i = 0; i < m_ActiveTetromino->m_Height; i++) {
 		for (int j = 0; j < m_ActiveTetromino->m_Width; j++) {
-			int boardRowSize = m_Board.size() - 1;
-			int boardColSize = m_Board[0].size() - 1;
-
 			if (m_ActiveTetromino->m_ColPos + j >= 0 && m_ActiveTetromino->m_ColPos + j <= boardColSize && m_ActiveTetromino->m_RowPos + i <= boardRowSize && m_ActiveTetromino->m_TetrominoData[i][j] == 1) {
-				m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j] = 1;
+				m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j].value = 1;
 			}
 		}
 	}
@@ -68,7 +105,7 @@ void Board::LockTetromino()
 	for (int i = 0; i < m_ActiveTetromino->m_Height; i++) {
 		for (int j = 0; j < m_ActiveTetromino->m_Width; j++) {
 			if (m_ActiveTetromino->m_TetrominoData[i][j] == 1) {
-				m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j] = 2;
+				m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j].value = 2;
 			}
 		}
 	}
@@ -78,9 +115,9 @@ void Board::ClearBoard()
 {
 	for (int i = 0; i < m_Board.size(); i++) {
 		for (int j = 0; j < m_Board[i].size(); j++) {
-			if (m_Board[i][j] == 2)
+			if (m_Board[i][j].value == 2)
 				continue;
-			m_Board[i][j] = 0;
+			m_Board[i][j].value = 0;
 		}
 	}
 }
@@ -107,7 +144,7 @@ void Board::HandleMovement(TetrominoMove dir)
 		int tempRow = m_ActiveTetromino->m_RowPos;
 		std::vector<std::vector<int>> tempData = m_ActiveTetromino->m_TetrominoData;
 
-		Tetromino temp(tempData);
+		Tetromino temp(tempData, nullptr);
 		temp.m_ColPos = tempCol;
 		temp.m_RowPos = tempRow;
 
@@ -136,7 +173,7 @@ bool Board::CanMove(TetrominoMove dir)
 					continue;
 
 				int leftEdge = m_ActiveTetromino->m_ColPos + j - 1;
-				if (leftEdge < 0 || m_Board[m_ActiveTetromino->m_RowPos + i][leftEdge] == 2)
+				if (leftEdge < 0 || m_Board[m_ActiveTetromino->m_RowPos + i][leftEdge].value == 2)
 				{
 					return false;
 				}
@@ -152,7 +189,7 @@ bool Board::CanMove(TetrominoMove dir)
 					continue;
 
 				int rightEdge = m_ActiveTetromino->m_ColPos + j + 1;
-				if (rightEdge >= m_Board[0].size() || m_Board[m_ActiveTetromino->m_RowPos + i][rightEdge] == 2)
+				if (rightEdge >= m_Board[0].size() || m_Board[m_ActiveTetromino->m_RowPos + i][rightEdge].value == 2)
 				{
 					return false;
 				}
@@ -168,7 +205,7 @@ bool Board::CanMove(TetrominoMove dir)
 					continue;
 
 				int bottomEdge = m_ActiveTetromino->m_RowPos + i + 1;
-				if (bottomEdge >= m_Board.size() || m_Board[bottomEdge][m_ActiveTetromino->m_ColPos + j] == 2)
+				if (bottomEdge >= m_Board.size() || m_Board[bottomEdge][m_ActiveTetromino->m_ColPos + j].value == 2)
 				{
 					LockTetromino();
 					m_ActiveTetromino->m_Active = false;
@@ -184,7 +221,6 @@ bool Board::CanMove(TetrominoMove dir)
 		std::cerr << "Must specify correct direction." << std::endl;
 		break;
 	}
-
 
 	return true;
 }
@@ -205,7 +241,7 @@ bool Board::IntersectsWithSettled(Tetromino tetromino)
 				continue;
 			if (tetromino.m_RowPos + i > m_Board.size() - 1)
 				return true;
-			if (m_Board[tetromino.m_RowPos + i][tetromino.m_ColPos + j] == 2)
+			if (m_Board[tetromino.m_RowPos + i][tetromino.m_ColPos + j].value == 2)
 				return true;
 		}
 	}
@@ -218,7 +254,7 @@ void Board::CheckLines()
 	int numOfLinesScored = 0;
 
 	for (int i{ (int)m_Board.size() - 1 }; i > 0; i--) {
-		if (std::all_of(m_Board[i].begin(), m_Board[i].end(), [settledValue](int n) { return n == settledValue; })) {
+		if (std::all_of(m_Board[i].begin(), m_Board[i].end(), [settledValue](Cell n) { return n.value == settledValue; })) {
 			numOfLinesScored++;
 			ShiftBoardDown(i);
 			i++;
@@ -236,7 +272,7 @@ void Board::ShiftBoardDown(int row)
 		m_Board[r] = m_Board[r - 1];
 	}
 
-	std::fill(m_Board[0].begin(), m_Board[0].end(), 0);
+	std::fill(m_Board[0].begin(), m_Board[0].end(), Cell{});
 }
 
 void Board::UpdateScore(int lines)
@@ -244,14 +280,30 @@ void Board::UpdateScore(int lines)
 	m_BoardScore += m_Scores.at(lines);
 }
 
+void Board::Draw(Shader& shader)
+{
+	glm::mat4 model = glm::mat4(1.0f);
+
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(1.2f, 1.3f, 1.0f));
+
+	shader.Bind();
+	shader.SetMat4("model", model);
+	shader.SetMat4("projection", m_Proj);
+	tOne->Bind();
+
+	glBindVertexArray(m_VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 void Board::PrintBoard()
 {
-	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
-	for (const auto& row : m_Board) {
-		for (int value : row) {
-			std::cout << value << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
+//	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
+//	for (const auto& row : m_Board) {
+//		for (int value : row) {
+//			std::cout << value << " ";
+//		}
+//		std::cout << std::endl;
+//	}
+//	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
 }

@@ -1,11 +1,15 @@
 #include "Tetromino.h"
 
-Tetromino::Tetromino(std::vector<std::vector<int>> tetrominoData, glm::vec3 color, int rowPos, int colPos)
+Tetromino::Tetromino(std::vector<std::vector<int>> tetrominoData, std::shared_ptr<Texture> texture, glm::vec3 color, int rowPos, int colPos)
 	:
-	m_TetrominoData(tetrominoData), m_Color(color), 
-	m_RowPos(rowPos), m_ColPos(colPos), 
-	m_Width(tetrominoData.size()), m_Height(tetrominoData[0].size())
-{}
+	m_TetrominoData(tetrominoData), m_Color(color),
+	m_RowPos(rowPos), m_ColPos(colPos),
+	m_Width(tetrominoData.size()), m_Height(tetrominoData[0].size()),
+	m_Texture(texture)
+{
+
+
+}
 
 Tetromino::~Tetromino()
 {}

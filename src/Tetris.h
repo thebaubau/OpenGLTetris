@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Shader.h"
 #include "Board.h"
+#include "Texture.h"
 
 enum GameState {
 	GAME_ACTIVE,
@@ -27,8 +28,6 @@ public:
 private:
 	GLFWwindow* m_Window = nullptr;
 
-	unsigned int m_VBO;
-	unsigned int m_VAO;
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];
 	std::unique_ptr<Shader> m_Shader;

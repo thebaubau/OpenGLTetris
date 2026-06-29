@@ -40,30 +40,17 @@ Tetris::Tetris()
 		glfwTerminate();
 	}
 
+	int fbWidth, fbHeight;
+	glfwGetFramebufferSize(m_Window, &fbWidth, &fbHeight);
+	FrameBufferSizeCallback(m_Window, fbWidth, fbHeight);
+
 	// Game related setup
 	
 	m_Board = std::make_unique<Board>();
 
-	m_Shader = std::make_unique<Shader>("res\\shaders\\simple_vertex_shader.glsl", "res\\shaders\\simple_frag_shader.glsl");
+	//m_Shader = std::make_unique<Shader>("res\\shaders\\simple_vertex_shader.glsl", "res\\shaders\\simple_frag_shader.glsl");
 
-	float triVertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
-	};
-
-	glGenBuffers(1, &m_VBO);
-	glGenVertexArrays(1, &m_VAO);
-
-	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
 
 	m_GameState = GAME_ACTIVE;
 }
@@ -88,20 +75,32 @@ void Tetris::Run()
 			double deltaTime = currentTime - previousTime;
 			ProcessInput();
 
+
 			if (deltaTime >= m_GameSpeed) {
-				system("cls");
+
 				if (m_Board->UpdateBoard()) {
-					m_Board->PrintBoard();
 					previousTime = currentTime;
 				}
 				else {
 					m_GameState = GAME_OVER;
 				}
-			}
-			m_Shader->Bind();
-			glBindVertexArray(m_VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 3);
 
+			//	system("cls");
+			//	if (m_Board->UpdateBoard()) {
+			//		m_Board->PrintBoard();
+			//		previousTime = currentTime;
+			//	}
+			//	else {
+			//		m_GameState = GAME_OVER;
+			//	}
+			}
+
+			m_Board->Draw(*m_Shader);
+			//m_Shader->Bind();
+			//glBindVertexArray(m_VAO);
+			
+			//glDrawArrays(GL_TRIANGLES, 0, 6);
+			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -153,5 +152,25 @@ void Tetris::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 void Tetris::FrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
+	float targetAspect = 10.0f / 20.0f;
+	float windowAspect = (float)width / (float)height;
+
+	int boardW = width;
+	int boardH = height;
+	int offsetX, offsetY;
+
+	if (windowAspect > targetAspect) {
+		boardW = boardH * targetAspect;
+
+		offsetX = ((float)width - boardW) / 2;
+		offsetY = ((float)height - boardH) / 2;
+	}
+	else {
+		boardH = boardW / targetAspect;
+
+		offsetX = ((float)width - boardW) / 2;
+		offsetY = ((float)height - boardH) / 2;
+	}
+
+	glViewport(offsetX, offsetY, boardW, boardH);
 }

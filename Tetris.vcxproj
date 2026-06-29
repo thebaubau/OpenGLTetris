@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="external\miniaudio.h" />
     <ClInclude Include="src\Board.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Tetris.h" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\glad.c" />
+    <ClCompile Include="external\stb_image.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />

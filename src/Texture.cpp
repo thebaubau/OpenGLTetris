@@ -16,14 +16,18 @@ Texture::Texture(std::string path, std::string type)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	stbi_image_free(m_LocalBuffer);
+	Unbind();
 
 	if (m_LocalBuffer)
 		stbi_image_free(m_LocalBuffer);
+
+	m_LocalBuffer = nullptr;
 }
 
 Texture::~Texture()
-{}
+{
+	glDeleteTextures(1, &m_RendererID);
+}
 
 void Texture::Bind(unsigned int slot) {
 	glActiveTexture(GL_TEXTURE0 + slot);
