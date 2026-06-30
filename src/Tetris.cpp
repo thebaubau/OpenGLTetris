@@ -73,34 +73,19 @@ void Tetris::Run()
 		if (m_GameState == GAME_ACTIVE) {
 			double currentTime = glfwGetTime();
 			double deltaTime = currentTime - previousTime;
+
 			ProcessInput();
 
-
 			if (deltaTime >= m_GameSpeed) {
-
 				if (m_Board->UpdateBoard()) {
 					previousTime = currentTime;
 				}
 				else {
 					m_GameState = GAME_OVER;
 				}
-
-			//	system("cls");
-			//	if (m_Board->UpdateBoard()) {
-			//		m_Board->PrintBoard();
-			//		previousTime = currentTime;
-			//	}
-			//	else {
-			//		m_GameState = GAME_OVER;
-			//	}
 			}
 
 			m_Board->Draw(*m_Shader);
-			//m_Shader->Bind();
-			//glBindVertexArray(m_VAO);
-			
-			//glDrawArrays(GL_TRIANGLES, 0, 6);
-			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
 		glfwSwapBuffers(m_Window);

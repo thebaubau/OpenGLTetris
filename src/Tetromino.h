@@ -16,7 +16,7 @@ enum TetrominoMove {
 class Tetromino
 {
 public:
-	Tetromino(std::vector<std::vector<int>> tetrominoData, std::shared_ptr<Texture> m_Texture, glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f), int rowPos = 7, int colPos = 3);
+	Tetromino(std::vector<std::vector<int>> tetrominoData, std::shared_ptr<Texture> m_Texture, glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f), int rowPos = 0, int colPos = 3);
 	~Tetromino();
 
 	std::vector<std::vector<int>> m_TetrominoData;

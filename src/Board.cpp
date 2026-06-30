@@ -17,7 +17,6 @@ Board::Board()
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), tOne));
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), tOne));
 
-
 	float triVertices[] = {
 		// positions        // texture coords
 		 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,   // top right
@@ -63,7 +62,6 @@ bool Board::UpdateBoard()
 	else {
 		HandleMovement(DOWN);
 	}
-	DrawBoard();
 	return true;
 }
 
@@ -86,7 +84,7 @@ bool Board::SpawnTetromino()
 void Board::DrawBoard() {
 	ClearBoard();
 
-	if (m_ActiveTetromino->m_Active == false) return;
+	if (m_ActiveTetromino == nullptr || m_ActiveTetromino->m_Active == false) return;
 
 	int boardRowSize = m_Board.size() - 1;
 	int boardColSize = m_Board[0].size() - 1;
@@ -282,18 +280,26 @@ void Board::UpdateScore(int lines)
 
 void Board::Draw(Shader& shader)
 {
-	glm::mat4 model = glm::mat4(1.0f);
+	DrawBoard();
+	for (int i{ 0 }; i < 20; ++i) 
+	{
+		for (int j{ 0 }; j < 10; ++j) {
+			if (m_Board[i][j].value == 1 || m_Board[i][j].value == 2) {
+				glm::mat4 model = glm::mat4(1.0f);
+				model = glm::translate(model, glm::vec3(j, i, 0.0f));
+				//model = glm::scale(model, glm::vec3(1.2f, 1.3f, 1.0f));
 
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(1.2f, 1.3f, 1.0f));
+				shader.Bind();
+				shader.SetMat4("model", model);
+				shader.SetMat4("projection", m_Proj);
+				tOne->Bind();
 
-	shader.Bind();
-	shader.SetMat4("model", model);
-	shader.SetMat4("projection", m_Proj);
-	tOne->Bind();
-
-	glBindVertexArray(m_VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(m_VAO);
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+		}
+	}
+	
 }
 
 void Board::PrintBoard()
