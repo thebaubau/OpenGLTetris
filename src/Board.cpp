@@ -122,6 +122,8 @@ void Board::ClearBoard()
 
 void Board::HandleMovement(TetrominoMove dir)
 {
+	if (m_ActiveTetromino == nullptr || m_ActiveTetromino->m_Active == false) return;
+
 	if (dir == LEFT && CanMove(LEFT)) {
 		std::cout << "Moving left" << std::endl;
 		m_ActiveTetromino->Move(LEFT);

@@ -28,6 +28,9 @@ public:
 private:
 	GLFWwindow* m_Window = nullptr;
 
+	double m_DeltaTime;
+	float m_GameTime;
+
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];
 	std::unique_ptr<Shader> m_Shader;
