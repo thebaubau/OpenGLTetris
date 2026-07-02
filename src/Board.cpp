@@ -107,6 +107,7 @@ void Board::LockTetromino()
 			}
 		}
 	}
+	std::cout << "Tetromino Locked" << std::endl;
 }
 
 void Board::ClearBoard()
@@ -302,16 +303,4 @@ void Board::Draw(Shader& shader)
 		}
 	}
 	
-}
-
-void Board::PrintBoard()
-{
-//	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
-//	for (const auto& row : m_Board) {
-//		for (int value : row) {
-//			std::cout << value << " ";
-//		}
-//		std::cout << std::endl;
-//	}
-//	std::cout << "=~=~=~=~=~=~=~=~=~=" << std::endl;
 }

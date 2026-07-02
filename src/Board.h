@@ -39,7 +39,6 @@ public:
 	bool UpdateBoard();
 	void DrawBoard();
 	void ClearBoard();
-	void PrintBoard();
 
 	bool SpawnTetromino();
 	void LockTetromino();

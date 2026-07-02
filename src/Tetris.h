@@ -30,6 +30,7 @@ private:
 
 	double m_DeltaTime;
 	float m_GameTime;
+	float m_PreviousTime;
 
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];

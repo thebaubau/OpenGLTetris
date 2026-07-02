@@ -45,9 +45,9 @@ Tetris::Tetris()
 
 	// Game related setup
 	
-	m_Board = std::make_unique<Board>();
+	m_PreviousTime = (float)glfwGetTime();
 
-	//m_Shader = std::make_unique<Shader>("res\\shaders\\simple_vertex_shader.glsl", "res\\shaders\\simple_frag_shader.glsl");
+	m_Board = std::make_unique<Board>();
 
 	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
 
@@ -70,7 +70,6 @@ void Tetris::Run()
 		if (m_GameState == GAME_ACTIVE) {
 			double currentTime = glfwGetTime();
 			m_DeltaTime = currentTime - m_GameTime;
-			ProcessInput();
 
 			if (m_DeltaTime >= m_GameSpeed) {
 				if (m_Board->UpdateBoard()) {
@@ -80,6 +79,8 @@ void Tetris::Run()
 					m_GameState = GAME_OVER;
 				}
 			}
+
+			ProcessInput();
 
 			m_Board->Draw(*m_Shader);
 		}
@@ -93,18 +94,18 @@ void Tetris::ProcessInput() {
 	float currentTime = (float)glfwGetTime();
 
 	if (m_Keys[GLFW_KEY_LEFT]) {
-		if (currentTime - m_GameTime >= cooldown) {
+		if (currentTime - m_PreviousTime >= cooldown) {
 			std::cout << "Pressed left" << std::endl;
 			m_Board->HandleMovement(LEFT);
-			m_GameTime = currentTime;
+			m_PreviousTime = currentTime;
 		}
 	}
 
 	if (m_Keys[GLFW_KEY_RIGHT]) {
-		if (currentTime - m_GameTime >= cooldown) {
+		if (currentTime - m_PreviousTime >= cooldown) {
 			std::cout << "Pressed right" << std::endl;
 			m_Board->HandleMovement(RIGHT);
-			m_GameTime = currentTime;
+			m_PreviousTime = currentTime;
 		}
 	}
 
@@ -115,9 +116,10 @@ void Tetris::ProcessInput() {
 	}
 
 	if (m_Keys[GLFW_KEY_DOWN]) {
-		if (currentTime - m_GameTime >= cooldown) {
+		if (currentTime - m_PreviousTime >= cooldown) {
 			std::cout << "Pressed down" << std::endl;
 			m_Board->HandleMovement(DOWN);
+			m_PreviousTime = currentTime;
 			m_GameTime = currentTime;
 		}
 	}
