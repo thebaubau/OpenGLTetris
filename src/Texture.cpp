@@ -6,7 +6,7 @@ Texture::Texture(std::string path, std::string type)
 	glGenTextures(1, &m_RendererID);
 	glBindTexture(GL_TEXTURE_2D, m_RendererID);
 	
-	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
+	m_LocalBuffer = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 4);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

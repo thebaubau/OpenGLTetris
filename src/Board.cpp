@@ -5,8 +5,7 @@ Board::Board()
 {
 	std::cout << "Constructing board" << std::endl;
 
-	tOne = std::make_shared<Texture>("res\\textures\\block_sprite.png");
-	m_Proj = glm::ortho(0.0f, (float)10, (float)20, 0.0f, -1.0f, 1.0f);
+	tOne = std::make_shared<Texture>("res\\textures\\block_sprite_1.png");
 
 	// Loading all tetromino data
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt"), tOne));
@@ -17,38 +16,7 @@ Board::Board()
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), tOne));
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), tOne));
 
-	float triVertices[] = {
-		// positions        // texture coords
-		 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,   // top right
-		 1.0f,  0.0f, 0.0f, 1.0f, 0.0f,   // bottom right
-		 0.0f,  0.0f, 0.0f, 0.0f, 0.0f,   // bottom left
-		 0.0f,  1.0f, 0.0f, 0.0f, 1.0f    // top left 
-	};
-
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	glGenBuffers(1, &m_VBO);
-	glGenBuffers(1, &m_EBO);
-	glGenVertexArrays(1, &m_VAO);
-
-	glBindVertexArray(m_VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triVertices), triVertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	m_BoardBg = std::make_unique<Texture>("res\\textures\\board_bg_1.jpg");
 }
 
 Board::~Board()
@@ -281,26 +249,27 @@ void Board::UpdateScore(int lines)
 	m_BoardScore += m_Scores.at(lines);
 }
 
-void Board::Draw(Shader& shader)
+void Board::Draw(SpriteRenderer& renderer, const Rect& board)
 {
 	DrawBoard();
-	for (int i{ 0 }; i < 20; ++i) 
-	{
+
+	// One grid cell in pixels.
+	float cellW = board.w / 10.0f;
+	float cellH = board.h / 20.0f;
+
+	// Board background, inset by a small margin (in cells) around the grid.
+	float margin = 0.1f;
+	glm::vec2 bgPos = { board.x - margin * cellW, board.y - margin * cellH };
+	glm::vec2 bgSize = { board.w + 2.0f * margin * cellW, board.h + 2.0f * margin * cellH };
+	renderer.Draw(*m_BoardBg, bgPos, bgSize);
+
+	// Board grid / tetrominos
+	for (int i{ 0 }; i < 20; ++i) {
 		for (int j{ 0 }; j < 10; ++j) {
 			if (m_Board[i][j].value == 1 || m_Board[i][j].value == 2) {
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(j, i, 0.0f));
-				//model = glm::scale(model, glm::vec3(1.2f, 1.3f, 1.0f));
-
-				shader.Bind();
-				shader.SetMat4("model", model);
-				shader.SetMat4("projection", m_Proj);
-				tOne->Bind();
-
-				glBindVertexArray(m_VAO);
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				glm::vec2 pos = { board.x + j * cellW, board.y + i * cellH };
+				renderer.Draw(*tOne, pos, { cellW, cellH });
 			}
 		}
 	}
-	
 }

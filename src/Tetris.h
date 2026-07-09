@@ -13,6 +13,11 @@ enum GameState {
 	GAME_WIN
 };
 
+struct GameLayout {
+	Rect board;
+	glm::mat4 boardTransform;
+};
+
 class Tetris
 {
 public:
@@ -21,7 +26,7 @@ public:
 
 	void Run();
 
-	int m_GameSpeed = 1;
+	int m_GameSpeed = 2;
 	GameState m_GameState;
 
 	std::unique_ptr<Board> m_Board;
@@ -34,9 +39,15 @@ private:
 
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];
+
 	std::unique_ptr<Shader> m_Shader;
+	std::unique_ptr<SpriteRenderer> m_SpriteRenderer;
+	GameLayout m_GameLayout;
+	glm::mat4 m_Proj;
 
 	void ProcessInput();
+	Rect FitAspect(Rect container, float aspectW, float aspectH);
+	GameLayout ComputeLayout(int windowW, int windowH);
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void ErrorCallback(int error, const char* description);

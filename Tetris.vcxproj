@@ -136,6 +136,7 @@
     <ClInclude Include="external\miniaudio.h" />
     <ClInclude Include="src\Board.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\SpriteRenderer.h" />
     <ClInclude Include="src\Tetris.h" />
     <ClInclude Include="src\Tetromino.h" />
     <ClInclude Include="src\TetrominoDataLoader.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\SpriteRenderer.cpp" />
     <ClCompile Include="src\Tetris.cpp" />
     <ClCompile Include="src\Tetromino.cpp" />
     <ClCompile Include="src\TetrominoDataLoader.cpp" />

@@ -8,11 +8,16 @@
 #include <random>
 #include "Tetromino.h"
 #include "TetrominoDataLoader.h"
+#include "SpriteRenderer.h"
 
 struct Cell {
 	int value = 0;
-	glm::vec3 color{ 1.0f }; 
+	glm::vec3 color{ 1.0f };
 	std::shared_ptr<Texture> texture;
+};
+
+struct Rect {
+	float x, y, w, h;
 };
 
 // 0 = Room to move
@@ -51,18 +56,14 @@ public:
 	void ShiftBoardDown(int row);
 	void UpdateScore(int lines);
 
-	void Draw(Shader& shader);
+	void Draw(SpriteRenderer& renderer, const Rect& board);
+
+	std::unique_ptr<Texture> m_BoardBg;
 
 private:
 	std::vector<std::vector<Cell>> m_Board;
 
-	unsigned int m_VBO;
-	unsigned int m_VAO;
-	unsigned int m_EBO;
-
 	std::shared_ptr<Texture> tOne;
-
-	glm::mat4 m_Proj;
 
 };
 

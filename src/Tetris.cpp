@@ -44,12 +44,12 @@ Tetris::Tetris()
 	FrameBufferSizeCallback(m_Window, fbWidth, fbHeight);
 
 	// Game related setup
-	
 	m_PreviousTime = (float)glfwGetTime();
 
 	m_Board = std::make_unique<Board>();
 
 	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
+	m_SpriteRenderer = std::make_unique<SpriteRenderer>(*m_Shader);
 
 	m_GameState = GAME_ACTIVE;
 }
@@ -82,7 +82,8 @@ void Tetris::Run()
 
 			ProcessInput();
 
-			m_Board->Draw(*m_Shader);
+			m_SpriteRenderer->SetProjection(m_Proj);
+			m_Board->Draw(*m_SpriteRenderer, m_GameLayout.board);
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -146,26 +147,51 @@ void Tetris::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
-void Tetris::FrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-	float targetAspect = 10.0f / 20.0f;
-	float windowAspect = (float)width / (float)height;
+Rect Tetris::FitAspect(Rect container, float aspectW, float aspectH) {
+	float containerAspect = container.w / container.h;
+	float targetAspect = aspectW / aspectH;
 
-	int boardW = width;
-	int boardH = height;
-	int offsetX, offsetY;
+	Rect r = container;
 
-	if (windowAspect > targetAspect) {
-		boardW = boardH * targetAspect;
-
-		offsetX = ((float)width - boardW) / 2;
-		offsetY = ((float)height - boardH) / 2;
+	if (containerAspect > targetAspect) {
+		r.w = container.h * targetAspect;
+		r.x = container.x + (container.w - r.w) * 0.5f;
 	}
 	else {
-		boardH = boardW / targetAspect;
-
-		offsetX = ((float)width - boardW) / 2;
-		offsetY = ((float)height - boardH) / 2;
+		r.h = container.w / targetAspect;
+		r.y = container.y + (container.h - r.h) * 0.5f;
 	}
 
-	glViewport(offsetX, offsetY, boardW, boardH);
+	return r;
+}
+
+glm::mat4 RectToTransform(const Rect& r, float logicalW, float logicalH) {
+	glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(r.x, r.y, 0.0f));
+	m = glm::scale(m, glm::vec3(r.w / logicalW, r.h / logicalH, 1.0f));
+	return m;
+}
+
+GameLayout Tetris::ComputeLayout(int windowW, int windowH) {
+	if (windowH <= 0) windowH = 1;
+
+	GameLayout layout;
+
+	float sidebarW = windowW * 0.25;
+	Rect boardContainer = { 0, 0, windowW - sidebarW, (float)windowH };
+	layout.board = FitAspect(boardContainer, 10.0f, 20.0f);
+	layout.boardTransform = RectToTransform(layout.board, 10.0f, 20.0f);
+
+	return layout;
+}
+
+void Tetris::FrameBufferSizeCallback(GLFWwindow* window, int width, int height) 
+{
+	if (width <= 0 || height <= 0) return;
+
+	Tetris* self = static_cast<Tetris*>(glfwGetWindowUserPointer(window));
+
+	glViewport(0, 0, width, height);
+
+	self->m_Proj = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+	self->m_GameLayout = self->ComputeLayout(width, height);
 }
