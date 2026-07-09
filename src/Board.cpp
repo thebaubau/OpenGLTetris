@@ -16,7 +16,7 @@ Board::Board()
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), tOne));
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), tOne));
 
-	m_BoardBg = std::make_unique<Texture>("res\\textures\\board_bg_1.jpg");
+	m_BoardBg = std::make_unique<Texture>("res\\textures\\board_bg.jpg");
 }
 
 Board::~Board()

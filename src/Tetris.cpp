@@ -98,7 +98,7 @@ void Tetris::Run()
 }
 
 void Tetris::ProcessInput() {
-	float cooldown = 0.1f;
+	float cooldown = 0.05f;
 	float currentTime = (float)glfwGetTime();
 
 	if (m_Keys[GLFW_KEY_LEFT]) {
@@ -124,6 +124,8 @@ void Tetris::ProcessInput() {
 	}
 
 	if (m_Keys[GLFW_KEY_DOWN]) {
+		if (m_Board->m_ActiveTetromino == nullptr || m_Board->m_ActiveTetromino->m_Active == false) return;
+
 		if (currentTime - m_PreviousTime >= cooldown) {
 			std::cout << "Pressed down" << std::endl;
 			m_Board->HandleMovement(DOWN);
@@ -201,7 +203,7 @@ GameLayout Tetris::ComputeLayout(int windowW, int windowH, int imageW, int image
 	Rect boardBackground = { 0, 0, windowW, windowH };
 	layout.gameBg = FitCover(boardBackground, imageW, imageH);
 
-	Rect boardContainer = { 0, 0, windowW - sidebarW, windowH };
+	Rect boardContainer = { 0, 0, windowW, windowH };
 	layout.board = FitAspect(boardContainer, 10.0f, 20.0f);
 	
 	return layout;
