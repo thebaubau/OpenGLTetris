@@ -15,7 +15,7 @@ enum GameState {
 
 struct GameLayout {
 	Rect board;
-	glm::mat4 boardTransform;
+	Rect gameBg;
 };
 
 class Tetris
@@ -41,13 +41,17 @@ private:
 	bool m_KeysProcessed[1024];
 
 	std::unique_ptr<Shader> m_Shader;
+	std::unique_ptr<Texture> m_GameBackground;
 	std::unique_ptr<SpriteRenderer> m_SpriteRenderer;
+
 	GameLayout m_GameLayout;
+	int m_WindowW, m_WindowH;
 	glm::mat4 m_Proj;
 
 	void ProcessInput();
 	Rect FitAspect(Rect container, float aspectW, float aspectH);
-	GameLayout ComputeLayout(int windowW, int windowH);
+	Rect FitCover(Rect container, float aspectW, float aspectH);
+	GameLayout ComputeLayout(int windowW, int windowH, int imageW, int imageH);
 
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void ErrorCallback(int error, const char* description);

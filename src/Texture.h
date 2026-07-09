@@ -17,6 +17,8 @@ public:
 	std::string m_Type;
 	unsigned char* m_LocalBuffer;
 
+	int GetWidth() const;
+	int GetHeight() const;
 
 private:
 	unsigned int m_RendererID;

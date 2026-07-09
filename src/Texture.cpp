@@ -37,3 +37,13 @@ void Texture::Bind(unsigned int slot) {
 void Texture::Unbind() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+int Texture::GetWidth() const
+{
+	return m_Width;
+}
+
+int Texture::GetHeight() const
+{
+	return m_Height;
+}
