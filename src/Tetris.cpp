@@ -47,8 +47,6 @@ Tetris::Tetris()
 	FrameBufferSizeCallback(m_Window, m_WindowW, m_WindowH);
 
 	// Game related setup
-	m_PreviousTime = (float)glfwGetTime();
-
 	m_Board = std::make_unique<Board>();
 
 	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
@@ -98,39 +96,53 @@ void Tetris::Run()
 }
 
 void Tetris::ProcessInput() {
-	float cooldown = 0.05f;
+	float cooldown = 0.07f;
+	float cooldownDAS = 0.17f;
 	float currentTime = (float)glfwGetTime();
 
 	if (m_Keys[GLFW_KEY_LEFT]) {
-		if (currentTime - m_PreviousTime >= cooldown) {
-			std::cout << "Pressed left" << std::endl;
+		if (!m_KeysProcessed[GLFW_KEY_LEFT]) {
 			m_Board->HandleMovement(LEFT);
-			m_PreviousTime = currentTime;
+			m_KeysProcessed[GLFW_KEY_LEFT] = true;
+			m_NextMoveTime[GLFW_KEY_LEFT] = currentTime + cooldownDAS;
+		}
+
+		else if (currentTime >= m_NextMoveTime[GLFW_KEY_LEFT]) {
+			m_Board->HandleMovement(LEFT);
+			m_NextMoveTime[GLFW_KEY_LEFT] = currentTime + cooldown;
 		}
 	}
 
 	if (m_Keys[GLFW_KEY_RIGHT]) {
-		if (currentTime - m_PreviousTime >= cooldown) {
-			std::cout << "Pressed right" << std::endl;
+		if (!m_KeysProcessed[GLFW_KEY_RIGHT]) {
 			m_Board->HandleMovement(RIGHT);
-			m_PreviousTime = currentTime;
+			m_KeysProcessed[GLFW_KEY_RIGHT] = true;
+			m_NextMoveTime[GLFW_KEY_RIGHT] = currentTime + cooldownDAS;
+		}
+
+		else if (currentTime >= m_NextMoveTime[GLFW_KEY_RIGHT]) {
+			m_Board->HandleMovement(RIGHT);
+			m_NextMoveTime[GLFW_KEY_RIGHT] = currentTime + cooldown;
 		}
 	}
 
 	if (m_Keys[GLFW_KEY_UP] && !m_KeysProcessed[GLFW_KEY_UP]) {
-		std::cout << "Pressed up" << std::endl;
 		m_Board->HandleMovement(ROTATE);
 		m_KeysProcessed[GLFW_KEY_UP] = true;
 	}
 
 	if (m_Keys[GLFW_KEY_DOWN]) {
-		if (m_Board->m_ActiveTetromino == nullptr || m_Board->m_ActiveTetromino->m_Active == false) return;
+		if (!m_KeysProcessed[GLFW_KEY_DOWN]) {
+			if (m_Board->HandleMovement(DOWN))
+				m_GameTime = currentTime;
+			m_KeysProcessed[GLFW_KEY_DOWN] = true;
+			m_NextMoveTime[GLFW_KEY_DOWN] = currentTime + cooldown;
+		}
 
-		if (currentTime - m_PreviousTime >= cooldown) {
-			std::cout << "Pressed down" << std::endl;
-			m_Board->HandleMovement(DOWN);
-			m_PreviousTime = currentTime;
-			m_GameTime = currentTime;
+		else if (currentTime >= m_NextMoveTime[GLFW_KEY_DOWN]) {
+			m_NextMoveTime[GLFW_KEY_DOWN] = currentTime + cooldown;
+			if (m_Board->HandleMovement(DOWN))
+				m_GameTime = currentTime;
 		}
 	}
 }

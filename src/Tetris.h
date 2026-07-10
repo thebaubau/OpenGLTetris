@@ -35,10 +35,10 @@ private:
 
 	double m_DeltaTime;
 	float m_GameTime;
-	float m_PreviousTime;
 
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];
+	float m_NextMoveTime[1024]{};
 
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Texture> m_GameBackground;

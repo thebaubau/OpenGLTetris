@@ -47,7 +47,7 @@ public:
 
 	bool SpawnTetromino();
 	void LockTetromino();
-	void HandleMovement(TetrominoMove dir);
+	bool HandleMovement(TetrominoMove dir);
 	bool CanMove(TetrominoMove dir);
 	void KickIntoBounds(Tetromino& tetromino);
 	bool IntersectsWithSettled(Tetromino tetromino);

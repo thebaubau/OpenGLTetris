@@ -89,23 +89,26 @@ void Board::ClearBoard()
 	}
 }
 
-void Board::HandleMovement(TetrominoMove dir)
+bool Board::HandleMovement(TetrominoMove dir)
 {
-	if (m_ActiveTetromino == nullptr || m_ActiveTetromino->m_Active == false) return;
+	if (m_ActiveTetromino == nullptr || m_ActiveTetromino->m_Active == false) return false;
 
 	if (dir == LEFT && CanMove(LEFT)) {
 		std::cout << "Moving left" << std::endl;
 		m_ActiveTetromino->Move(LEFT);
+		return true;
 	}
 
 	if (dir == RIGHT && CanMove(RIGHT)) {
 		std::cout << "Moving right" << std::endl;
 		m_ActiveTetromino->Move(RIGHT);
+		return true;
 	}
 
 	if (dir == DOWN && CanMove(DOWN)) {
 		std::cout << "Moving down" << std::endl;
 		m_ActiveTetromino->Move(DOWN);
+		return true;
 	}
 
 	if (dir == ROTATE) {
@@ -125,8 +128,11 @@ void Board::HandleMovement(TetrominoMove dir)
 			m_ActiveTetromino->m_ColPos = temp.m_ColPos;
 			m_ActiveTetromino->m_RowPos = temp.m_RowPos;
 			m_ActiveTetromino->Move(ROTATE);
+			return true;
 		}
 	}
+
+	return false;
 }
 
 bool Board::CanMove(TetrominoMove dir)
