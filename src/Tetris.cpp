@@ -95,35 +95,32 @@ void Tetris::Run()
 	}
 }
 
+bool Tetris::HandleKeyRepeat(int key, TetrominoMove dir, float firstDelay, float repeatDelay, float now) {
+	if (!m_KeysProcessed[key]) {
+		m_KeysProcessed[key] = true;
+		m_NextMoveTime[key] = now + firstDelay;
+		return m_Board->HandleMovement(dir);
+	}
+
+	else if (now >= m_NextMoveTime[key]) {
+		m_NextMoveTime[key] = now + repeatDelay;
+		return m_Board->HandleMovement(dir);
+	}
+
+	return false;
+}
+
 void Tetris::ProcessInput() {
 	float cooldown = 0.07f;
 	float cooldownDAS = 0.17f;
 	float currentTime = (float)glfwGetTime();
 
 	if (m_Keys[GLFW_KEY_LEFT]) {
-		if (!m_KeysProcessed[GLFW_KEY_LEFT]) {
-			m_Board->HandleMovement(LEFT);
-			m_KeysProcessed[GLFW_KEY_LEFT] = true;
-			m_NextMoveTime[GLFW_KEY_LEFT] = currentTime + cooldownDAS;
-		}
-
-		else if (currentTime >= m_NextMoveTime[GLFW_KEY_LEFT]) {
-			m_Board->HandleMovement(LEFT);
-			m_NextMoveTime[GLFW_KEY_LEFT] = currentTime + cooldown;
-		}
+		HandleKeyRepeat(GLFW_KEY_LEFT, LEFT, cooldownDAS, cooldown, currentTime);
 	}
 
 	if (m_Keys[GLFW_KEY_RIGHT]) {
-		if (!m_KeysProcessed[GLFW_KEY_RIGHT]) {
-			m_Board->HandleMovement(RIGHT);
-			m_KeysProcessed[GLFW_KEY_RIGHT] = true;
-			m_NextMoveTime[GLFW_KEY_RIGHT] = currentTime + cooldownDAS;
-		}
-
-		else if (currentTime >= m_NextMoveTime[GLFW_KEY_RIGHT]) {
-			m_Board->HandleMovement(RIGHT);
-			m_NextMoveTime[GLFW_KEY_RIGHT] = currentTime + cooldown;
-		}
+		HandleKeyRepeat(GLFW_KEY_RIGHT, RIGHT, cooldownDAS, cooldown, currentTime);
 	}
 
 	if (m_Keys[GLFW_KEY_UP] && !m_KeysProcessed[GLFW_KEY_UP]) {
@@ -132,18 +129,8 @@ void Tetris::ProcessInput() {
 	}
 
 	if (m_Keys[GLFW_KEY_DOWN]) {
-		if (!m_KeysProcessed[GLFW_KEY_DOWN]) {
-			if (m_Board->HandleMovement(DOWN))
-				m_GameTime = currentTime;
-			m_KeysProcessed[GLFW_KEY_DOWN] = true;
-			m_NextMoveTime[GLFW_KEY_DOWN] = currentTime + cooldown;
-		}
-
-		else if (currentTime >= m_NextMoveTime[GLFW_KEY_DOWN]) {
-			m_NextMoveTime[GLFW_KEY_DOWN] = currentTime + cooldown;
-			if (m_Board->HandleMovement(DOWN))
-				m_GameTime = currentTime;
-		}
+		if (HandleKeyRepeat(GLFW_KEY_DOWN, DOWN, cooldown, cooldown, currentTime))
+			m_GameTime = currentTime;
 	}
 }
 

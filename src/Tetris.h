@@ -26,6 +26,7 @@ public:
 
 	void Run();
 
+
 	int m_GameSpeed = 2;
 	GameState m_GameState;
 
@@ -48,6 +49,7 @@ private:
 	int m_WindowW, m_WindowH;
 	glm::mat4 m_Proj;
 
+	bool HandleKeyRepeat(int key, TetrominoMove dir, float firstDelay, float repeatDelay, float now);
 	void ProcessInput();
 	Rect FitAspect(Rect container, float aspectW, float aspectH);
 	Rect FitCover(Rect container, float aspectW, float aspectH);
