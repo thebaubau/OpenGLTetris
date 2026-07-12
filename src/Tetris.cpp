@@ -115,12 +115,9 @@ void Tetris::ProcessInput() {
 	float cooldownDAS = 0.17f;
 	float currentTime = (float)glfwGetTime();
 
-	if (m_Keys[GLFW_KEY_LEFT]) {
-		HandleKeyRepeat(GLFW_KEY_LEFT, LEFT, cooldownDAS, cooldown, currentTime);
-	}
-
-	if (m_Keys[GLFW_KEY_RIGHT]) {
-		HandleKeyRepeat(GLFW_KEY_RIGHT, RIGHT, cooldownDAS, cooldown, currentTime);
+	if (m_ActiveHorizontalKey != 0) {
+		TetrominoMove dir = (m_ActiveHorizontalKey == GLFW_KEY_LEFT) ? LEFT : RIGHT;
+		HandleKeyRepeat(m_ActiveHorizontalKey, dir, cooldownDAS, cooldown, currentTime);
 	}
 
 	if (m_Keys[GLFW_KEY_UP] && !m_KeysProcessed[GLFW_KEY_UP]) {
@@ -151,6 +148,27 @@ void Tetris::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		{
 			m_Keys[key] = false;
 			m_KeysProcessed[key] = false;
+		}
+
+		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT)
+		{
+			int other = (key == GLFW_KEY_LEFT) ? GLFW_KEY_RIGHT : GLFW_KEY_LEFT;
+
+			if (action == GLFW_PRESS)
+			{
+				m_ActiveHorizontalKey = key;
+				m_KeysProcessed[key] = false;
+			}
+			else if (action == GLFW_RELEASE && key == m_ActiveHorizontalKey)
+			{
+				if (m_Keys[other])
+				{
+					m_ActiveHorizontalKey = other;
+					m_KeysProcessed[other] = false;
+				}
+				else
+					m_ActiveHorizontalKey = 0;
+			}
 		}
 	}
 }

@@ -40,6 +40,7 @@ private:
 	bool m_Keys[1024];
 	bool m_KeysProcessed[1024];
 	float m_NextMoveTime[1024]{};
+	int m_ActiveHorizontalKey = 0;
 
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Texture> m_GameBackground;
