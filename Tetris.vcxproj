@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="external\miniaudio.h" />
+    <ClInclude Include="src\NextTetromino.h" />
     <ClInclude Include="src\Board.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\SpriteRenderer.h" />
@@ -141,10 +142,12 @@
     <ClInclude Include="src\Tetromino.h" />
     <ClInclude Include="src\TetrominoDataLoader.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Rect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="external\glad.c" />
     <ClCompile Include="external\stb_image.cpp" />
+    <ClCompile Include="src\NextTetromino.cpp" />
     <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\main.cpp" />

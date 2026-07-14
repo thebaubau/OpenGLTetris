@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Board.h"
 #include "Texture.h"
+#include "NextTetromino.h"
 
 enum GameState {
 	GAME_ACTIVE,
@@ -16,6 +17,11 @@ enum GameState {
 struct GameLayout {
 	Rect board;
 	Rect gameBg;
+	Rect nextTetromino;
+
+	// Pixels per block. Single source of truth: the board and the
+	// preview panel must render blocks at the same size.
+	float cellSize = 0.0f;
 };
 
 class Tetris
@@ -26,11 +32,11 @@ public:
 
 	void Run();
 
-
-	int m_GameSpeed = 2;
+	int m_GameSpeed = 1;
 	GameState m_GameState;
 
 	std::unique_ptr<Board> m_Board;
+	std::unique_ptr<NextTetromino> m_Next;
 private:
 	GLFWwindow* m_Window = nullptr;
 

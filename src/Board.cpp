@@ -38,9 +38,16 @@ bool Board::SpawnTetromino()
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distr(0, m_Tetrominos.size() - 1);
-	Tetromino randomValue = m_Tetrominos[distr(gen)];
 
-	m_ActiveTetromino = std::make_unique<Tetromino>(randomValue);
+	if (m_NextTetromino != nullptr) {
+		m_ActiveTetromino = std::move(m_NextTetromino);
+	}
+	else {
+		m_ActiveTetromino = std::make_unique<Tetromino>(m_Tetrominos[distr(gen)]);
+	}
+
+	m_NextTetromino = std::make_unique<Tetromino>(m_Tetrominos[distr(gen)]);
+
 	if (IntersectsWithSettled(*m_ActiveTetromino)) {
 		return false;
 	}
@@ -264,7 +271,7 @@ void Board::Draw(SpriteRenderer& renderer, const Rect& board)
 	float cellH = board.h / 20.0f;
 
 	// Board background, inset by a small margin (in cells) around the grid.
-	float margin = 0.1f;
+	float margin = 0.2f;
 	glm::vec2 bgPos = { board.x - margin * cellW, board.y - margin * cellH };
 	glm::vec2 bgSize = { board.w + 2.0f * margin * cellW, board.h + 2.0f * margin * cellH };
 	renderer.Draw(*m_BoardBg, bgPos, bgSize);

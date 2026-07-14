@@ -48,6 +48,7 @@ Tetris::Tetris()
 
 	// Game related setup
 	m_Board = std::make_unique<Board>();
+	m_Next = std::make_unique<NextTetromino>();
 
 	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
 	m_SpriteRenderer = std::make_unique<SpriteRenderer>(*m_Shader);
@@ -84,11 +85,16 @@ void Tetris::Run()
 			ProcessInput();
 
 			m_SpriteRenderer->SetProjection(m_Proj);
+
 			m_SpriteRenderer->Draw(
 				*m_GameBackground, 
 				glm::vec2(m_GameLayout.gameBg.x, m_GameLayout.gameBg.y), 
 				glm::vec2(m_GameLayout.gameBg.w, m_GameLayout.gameBg.h));
 			m_Board->Draw(*m_SpriteRenderer, m_GameLayout.board);
+			
+			if (m_Board->m_NextTetromino != nullptr) {
+				m_Next->Draw(*m_SpriteRenderer, m_GameLayout.nextTetromino, *m_Board->m_NextTetromino, m_GameLayout.cellSize);
+			}
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -215,14 +221,28 @@ GameLayout Tetris::ComputeLayout(int windowW, int windowH, int imageW, int image
 	if (windowH <= 0) windowH = 1;
 
 	GameLayout layout;
-	float sidebarW = windowW * 0.25f;
 
-	Rect boardBackground = { 0, 0, windowW, windowH };
-	layout.gameBg = FitCover(boardBackground, imageW, imageH);
+	Rect gameBackground = { 0, 0, (float)windowW, (float)windowH };
+	layout.gameBg = FitCover(gameBackground, (float)imageW, (float)imageH);
 
-	Rect boardContainer = { 0, 0, windowW, windowH };
+	const float padY = 30.0f;
+
+	Rect boardContainer = { 0.0f, padY, (float)windowW, windowH - 2.0f * padY };
 	layout.board = FitAspect(boardContainer, 10.0f, 20.0f);
-	
+
+	// One block in pixels. Everything else is a multiple of this.
+	layout.cellSize = layout.board.w / 10.0f;
+
+	const float panelSize = 5.0f * layout.cellSize;
+	const float nextX = layout.board.x + layout.board.w + layout.cellSize;
+
+	layout.nextTetromino = {
+		nextX,
+		layout.board.y,
+		panelSize,
+		panelSize
+	};
+
 	return layout;
 }
 

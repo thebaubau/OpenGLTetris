@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <random>
+#include <Rect.h>
 #include "Tetromino.h"
 #include "TetrominoDataLoader.h"
 #include "SpriteRenderer.h"
@@ -14,10 +15,6 @@ struct Cell {
 	int value = 0;
 	glm::vec3 color{ 1.0f };
 	std::shared_ptr<Texture> texture;
-};
-
-struct Rect {
-	float x, y, w, h;
 };
 
 // 0 = Room to move
@@ -31,6 +28,7 @@ public:
 
 	std::vector<Tetromino> m_Tetrominos;
 	std::unique_ptr<Tetromino> m_ActiveTetromino;
+	std::unique_ptr<Tetromino> m_NextTetromino;
 
 	int m_SpawnPostion[2] = { 0, 3 };
 	int m_BoardScore = 0;
