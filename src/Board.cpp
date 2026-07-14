@@ -262,26 +262,22 @@ void Board::UpdateScore(int lines)
 	m_BoardScore += m_Scores.at(lines);
 }
 
-void Board::Draw(SpriteRenderer& renderer, const Rect& board)
+void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)
 {
 	DrawBoard();
 
-	// One grid cell in pixels.
-	float cellW = board.w / 10.0f;
-	float cellH = board.h / 20.0f;
-
 	// Board background, inset by a small margin (in cells) around the grid.
 	float margin = 0.2f;
-	glm::vec2 bgPos = { board.x - margin * cellW, board.y - margin * cellH };
-	glm::vec2 bgSize = { board.w + 2.0f * margin * cellW, board.h + 2.0f * margin * cellH };
+	glm::vec2 bgPos = { board.x - margin * cellSize, board.y - margin * cellSize };
+	glm::vec2 bgSize = { board.w + 2.0f * margin * cellSize, board.h + 2.0f * margin * cellSize };
 	renderer.Draw(*m_BoardBg, bgPos, bgSize);
 
 	// Board grid / tetrominos
 	for (int i{ 0 }; i < 20; ++i) {
 		for (int j{ 0 }; j < 10; ++j) {
 			if (m_Board[i][j].value == 1 || m_Board[i][j].value == 2) {
-				glm::vec2 pos = { board.x + j * cellW, board.y + i * cellH };
-				renderer.Draw(*tOne, pos, { cellW, cellH });
+				glm::vec2 pos = { board.x + j * cellSize, board.y + i * cellSize };
+				renderer.Draw(*tOne, pos, { cellSize, cellSize });
 			}
 		}
 	}

@@ -90,7 +90,7 @@ void Tetris::Run()
 				*m_GameBackground, 
 				glm::vec2(m_GameLayout.gameBg.x, m_GameLayout.gameBg.y), 
 				glm::vec2(m_GameLayout.gameBg.w, m_GameLayout.gameBg.h));
-			m_Board->Draw(*m_SpriteRenderer, m_GameLayout.board);
+			m_Board->Draw(*m_SpriteRenderer, m_GameLayout.board, m_GameLayout.cellSize);
 			
 			if (m_Board->m_NextTetromino != nullptr) {
 				m_Next->Draw(*m_SpriteRenderer, m_GameLayout.nextTetromino, *m_Board->m_NextTetromino, m_GameLayout.cellSize);
@@ -233,7 +233,7 @@ GameLayout Tetris::ComputeLayout(int windowW, int windowH, int imageW, int image
 	// One block in pixels. Everything else is a multiple of this.
 	layout.cellSize = layout.board.w / 10.0f;
 
-	const float panelSize = 5.0f * layout.cellSize;
+	const float panelSize = 4.0f * layout.cellSize;
 	const float nextX = layout.board.x + layout.board.w + layout.cellSize;
 
 	layout.nextTetromino = {

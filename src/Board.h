@@ -54,7 +54,7 @@ public:
 	void ShiftBoardDown(int row);
 	void UpdateScore(int lines);
 
-	void Draw(SpriteRenderer& renderer, const Rect& board);
+	void Draw(SpriteRenderer& renderer, const Rect& board, float cellSize);
 
 	std::unique_ptr<Texture> m_BoardBg;
 

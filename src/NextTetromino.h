@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <iostream>
@@ -14,7 +15,7 @@ public:
 	~NextTetromino();
 
 	void Draw(SpriteRenderer& renderer, const Rect& rect, const Tetromino& next, float cellSize);
-	std::unique_ptr<Texture> m_BoardBg;
+	std::unique_ptr<Texture> m_PanelBg;
 
 private:
 };
