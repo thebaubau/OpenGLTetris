@@ -5,16 +5,35 @@ Board::Board()
 {
 	std::cout << "Constructing board" << std::endl;
 
-	tOne = std::make_shared<Texture>("res\\textures\\block_sprite_1.png");
-
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_blue.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_less_orange.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_green.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_pink.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_purple.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_red.jpg"));
+	
+	m_TetrominoTextures.push_back(
+		std::make_shared<Texture>("res\\textures\\tetromino_teal.jpg"));
+	
 	// Loading all tetromino data
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_ll.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_i.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_z.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_s.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), tOne));
-	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), tOne));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt"), m_TetrominoTextures[0]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_ll.txt"), m_TetrominoTextures[1]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_i.txt"), m_TetrominoTextures[2]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_z.txt"), m_TetrominoTextures[3]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_s.txt"), m_TetrominoTextures[4]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_sq.txt"), m_TetrominoTextures[5]));
+	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), m_TetrominoTextures[6]));
 
 	m_BoardBg = std::make_unique<Texture>("res\\textures\\board_bg.jpg");
 }
@@ -277,8 +296,9 @@ void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)
 		for (int j{ 0 }; j < 10; ++j) {
 			if (m_Board[i][j].value == 1 || m_Board[i][j].value == 2) {
 				glm::vec2 pos = { board.x + j * cellSize, board.y + i * cellSize };
-				renderer.Draw(*tOne, pos, { cellSize, cellSize });
+				renderer.Draw(*m_ActiveTetromino->m_Texture, pos, { cellSize, cellSize });
 			}
+		
 		}
 	}
 }

@@ -61,7 +61,7 @@ public:
 private:
 	std::vector<std::vector<Cell>> m_Board;
 
-	std::shared_ptr<Texture> tOne;
+	std::vector<std::shared_ptr<Texture>> m_TetrominoTextures;
 
 };
 
