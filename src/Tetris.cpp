@@ -90,6 +90,7 @@ void Tetris::Run()
 				*m_GameBackground, 
 				glm::vec2(m_GameLayout.gameBg.x, m_GameLayout.gameBg.y), 
 				glm::vec2(m_GameLayout.gameBg.w, m_GameLayout.gameBg.h));
+
 			m_Board->Draw(*m_SpriteRenderer, m_GameLayout.board, m_GameLayout.cellSize);
 			
 			if (m_Board->m_NextTetromino != nullptr) {

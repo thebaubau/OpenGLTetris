@@ -5,26 +5,13 @@ Board::Board()
 {
 	std::cout << "Constructing board" << std::endl;
 
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_blue.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_less_orange.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_green.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_pink.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_purple.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_red.jpg"));
-	
-	m_TetrominoTextures.push_back(
-		std::make_shared<Texture>("res\\textures\\tetromino_teal.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_blue.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_less_orange.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_green.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_pink.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_purple.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_red.jpg"));
+	m_TetrominoTextures.push_back(std::make_shared<Texture>("res\\textures\\tetromino_teal.jpg"));
 	
 	// Loading all tetromino data
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_l.txt"), m_TetrominoTextures[0]));
@@ -97,7 +84,9 @@ void Board::LockTetromino()
 	for (int i = 0; i < m_ActiveTetromino->m_Height; i++) {
 		for (int j = 0; j < m_ActiveTetromino->m_Width; j++) {
 			if (m_ActiveTetromino->m_TetrominoData[i][j] == 1) {
-				m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j].value = 2;
+				Cell& cell = m_Board[m_ActiveTetromino->m_RowPos + i][m_ActiveTetromino->m_ColPos + j];
+				cell.value = 2;
+				cell.texture = m_ActiveTetromino->m_Texture;
 			}
 		}
 	}
@@ -131,10 +120,18 @@ bool Board::HandleMovement(TetrominoMove dir)
 		return true;
 	}
 
-	if (dir == DOWN && CanMove(DOWN)) {
-		std::cout << "Moving down" << std::endl;
-		m_ActiveTetromino->Move(DOWN);
-		return true;
+	if (dir == DOWN) {
+		if (CanMove(DOWN)) {
+			std::cout << "Moving down" << std::endl;
+			m_ActiveTetromino->Move(DOWN);
+			return true;
+		}
+		else {
+			LockTetromino();
+			m_ActiveTetromino->m_Active = false;
+			CheckLines();
+			return false;
+		}
 	}
 
 	if (dir == ROTATE) {
@@ -208,10 +205,6 @@ bool Board::CanMove(TetrominoMove dir)
 				int bottomEdge = m_ActiveTetromino->m_RowPos + i + 1;
 				if (bottomEdge >= m_Board.size() || m_Board[bottomEdge][m_ActiveTetromino->m_ColPos + j].value == 2)
 				{
-					LockTetromino();
-					m_ActiveTetromino->m_Active = false;
-					CheckLines();
-
 					return false;
 				}
 			}
@@ -287,6 +280,7 @@ void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)
 
 	// Board background, inset by a small margin (in cells) around the grid.
 	float margin = 0.2f;
+
 	glm::vec2 bgPos = { board.x - margin * cellSize, board.y - margin * cellSize };
 	glm::vec2 bgSize = { board.w + 2.0f * margin * cellSize, board.h + 2.0f * margin * cellSize };
 	renderer.Draw(*m_BoardBg, bgPos, bgSize);
@@ -294,9 +288,16 @@ void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)
 	// Board grid / tetrominos
 	for (int i{ 0 }; i < 20; ++i) {
 		for (int j{ 0 }; j < 10; ++j) {
-			if (m_Board[i][j].value == 1 || m_Board[i][j].value == 2) {
+			int cell = m_Board[i][j].value;
+			
+			if (cell == 1 || cell == 2) {
 				glm::vec2 pos = { board.x + j * cellSize, board.y + i * cellSize };
-				renderer.Draw(*m_ActiveTetromino->m_Texture, pos, { cellSize, cellSize });
+				if (cell == 1) {
+					renderer.Draw(*m_ActiveTetromino->m_Texture, pos, { cellSize, cellSize });
+				}
+				else {
+					renderer.Draw(*m_Board[i][j].texture, pos, {cellSize, cellSize});
+				}
 			}
 		
 		}
