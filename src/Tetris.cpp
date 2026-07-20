@@ -45,14 +45,25 @@ Tetris::Tetris()
 
 	glfwGetFramebufferSize(m_Window, &m_WindowW, &m_WindowH);
 	FrameBufferSizeCallback(m_Window, m_WindowW, m_WindowH);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Game related setup
 	m_Board = std::make_unique<Board>();
 	m_Next = std::make_unique<NextTetromino>();
 
-	m_Shader = std::make_unique<Shader>("res\\shaders\\game_elements_vertex_shader.glsl", "res\\shaders\\game_elements_frag_shader.glsl");
-	m_SpriteRenderer = std::make_unique<SpriteRenderer>(*m_Shader);
+	m_Shader = std::make_unique<Shader>(
+		"res\\shaders\\game_elements_vertex_shader.glsl", 
+		"res\\shaders\\game_elements_frag_shader.glsl");
+	
+	m_TextShader = std::make_unique<Shader>(
+		"res\\shaders\\text_vertex_shader.glsl", 
+		"res\\shaders\\text_frag_shader.glsl");
 
+	m_SpriteRenderer = std::make_unique<SpriteRenderer>(*m_Shader);
+	m_TextRenderer = std::make_unique<TextRenderer>("res\\fonts\\Roboto-Regular.ttf");
+	
 	m_GameState = GAME_ACTIVE;
 }
 
@@ -96,6 +107,8 @@ void Tetris::Run()
 			if (m_Board->m_NextTetromino != nullptr) {
 				m_Next->Draw(*m_SpriteRenderer, m_GameLayout.nextTetromino, *m_Board->m_NextTetromino, m_GameLayout.cellSize);
 			}
+
+			m_TextRenderer->RenderText(*m_TextShader, "Score", m_GameLayout.scoreLabel.x, m_GameLayout.scoreLabel.y, 1.0f, glm::vec3(0.3, 0.7f, 0.9f), m_Proj);
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -237,12 +250,17 @@ GameLayout Tetris::ComputeLayout(int windowW, int windowH, int imageW, int image
 	const float panelSize = 4.0f * layout.cellSize;
 	const float nextX = layout.board.x + layout.board.w + layout.cellSize;
 
-	layout.nextTetromino = {
-		nextX,
-		layout.board.y,
-		panelSize,
-		panelSize
-	};
+	layout.nextTetromino = { nextX, layout.board.y, panelSize, panelSize };
+
+	const float scoreY = layout.board.y + panelSize + padY;
+
+	//Rect score = { nextX, scoreY, panelSize, panelSize };
+
+	layout.scoreLabel = { nextX, scoreY, panelSize, panelSize };
+
+	//std::cout << "Next X: " << nextX << std::endl;
+	//std::cout << layout.nextTetromino.x << std::endl;
+	//std::cout << layout.scoreLabel.x << std::endl;
 
 	return layout;
 }

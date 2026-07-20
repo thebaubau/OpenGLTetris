@@ -4,6 +4,7 @@
 #include <GLFW\glfw3.h>
 #include <iostream>
 #include "Shader.h"
+#include "TextRenderer.h"
 #include "Board.h"
 #include "Texture.h"
 #include "NextTetromino.h"
@@ -18,6 +19,7 @@ struct GameLayout {
 	Rect board;
 	Rect gameBg;
 	Rect nextTetromino;
+	Rect scoreLabel;
 
 	// Pixels per block. Single source of truth: the board and the
 	// preview panel must render blocks at the same size.
@@ -49,8 +51,10 @@ private:
 	int m_ActiveHorizontalKey = 0;
 
 	std::unique_ptr<Shader> m_Shader;
+	std::unique_ptr<Shader> m_TextShader;
 	std::unique_ptr<Texture> m_GameBackground;
 	std::unique_ptr<SpriteRenderer> m_SpriteRenderer;
+	std::unique_ptr<TextRenderer> m_TextRenderer;
 
 	GameLayout m_GameLayout;
 	int m_WindowW, m_WindowH;
