@@ -19,7 +19,7 @@ Tetris::Tetris()
 
 	m_WindowH = 0;
 	m_WindowW = 0;
-	m_Window = glfwCreateWindow(800, 600, "Tetris", NULL, NULL);
+	m_Window = glfwCreateWindow(1280, 720, "Tetris", NULL, NULL);
 
 	if (m_Window == NULL) {
 		std::cerr << "Failed to load GLFW window" << std::endl;
@@ -62,7 +62,7 @@ Tetris::Tetris()
 		"res\\shaders\\text_frag_shader.glsl");
 
 	m_SpriteRenderer = std::make_unique<SpriteRenderer>(*m_Shader);
-	m_TextRenderer = std::make_unique<TextRenderer>("res\\fonts\\Roboto-Regular.ttf");
+	m_TextRenderer = std::make_unique<TextRenderer>("res\\fonts\\OCRAEXT.ttf");
 	
 	m_GameState = GAME_ACTIVE;
 }
@@ -84,7 +84,7 @@ void Tetris::Run()
 			double currentTime = glfwGetTime();
 			m_DeltaTime = currentTime - m_GameTime;
 
-			if (m_DeltaTime >= m_GameSpeed) {
+			if (m_DeltaTime >= m_Board->m_GameSpeed) {
 				if (m_Board->UpdateBoard()) {
 					m_GameTime = currentTime;
 				}
@@ -108,7 +108,18 @@ void Tetris::Run()
 				m_Next->Draw(*m_SpriteRenderer, m_GameLayout.nextTetromino, *m_Board->m_NextTetromino, m_GameLayout.cellSize);
 			}
 
-			m_TextRenderer->RenderText(*m_TextShader, "Score", m_GameLayout.scoreLabel.x, m_GameLayout.scoreLabel.y, 1.0f, glm::vec3(0.3, 0.7f, 0.9f), m_Proj);
+			m_TextRenderer->RenderTextCentered(*m_TextShader, "Score", m_GameLayout.scoreLabel, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
+			m_TextRenderer->RenderTextCentered(*m_TextShader, std::to_string(m_Board->m_BoardScore), m_GameLayout.score, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
+			m_TextRenderer->RenderTextCentered(*m_TextShader, "Level", m_GameLayout.levelLabel, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
+			m_TextRenderer->RenderTextCentered(*m_TextShader, std::to_string(m_Board->m_Level + 1), m_GameLayout.level, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
+			m_TextRenderer->RenderTextCentered(*m_TextShader, "Lines", m_GameLayout.linesLabel, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
+			m_TextRenderer->RenderTextCentered(*m_TextShader, std::to_string(m_Board->m_NumOfLines), m_GameLayout.lines, m_GameLayout.cellSize / FONT_PIXEL_SIZE, glm::vec3(1.0f, 1.0f, 1.0f), m_Proj);
+
 		}
 
 		glfwSwapBuffers(m_Window);
@@ -247,20 +258,41 @@ GameLayout Tetris::ComputeLayout(int windowW, int windowH, int imageW, int image
 	// One block in pixels. Everything else is a multiple of this.
 	layout.cellSize = layout.board.w / 10.0f;
 
+	// Right side of the board
 	const float panelSize = 4.0f * layout.cellSize;
 	const float nextX = layout.board.x + layout.board.w + layout.cellSize;
 
 	layout.nextTetromino = { nextX, layout.board.y, panelSize, panelSize };
 
-	const float scoreY = layout.board.y + panelSize + padY;
+	// Left side of the board — stacked top to bottom: score, level, lines
+	const float leftSideXMin = layout.board.x - padY - panelSize;
+	const float leftSideYMin = layout.board.y + padY;
 
-	//Rect score = { nextX, scoreY, panelSize, panelSize };
+	// Score info
+	layout.scoreLabel = { leftSideXMin, leftSideYMin, panelSize, panelSize };
 
-	layout.scoreLabel = { nextX, scoreY, panelSize, panelSize };
+	const float scoreValueY = leftSideYMin + layout.cellSize * 1.5f;
 
-	//std::cout << "Next X: " << nextX << std::endl;
-	//std::cout << layout.nextTetromino.x << std::endl;
-	//std::cout << layout.scoreLabel.x << std::endl;
+	layout.score = { leftSideXMin, scoreValueY, panelSize, panelSize };
+
+	// Level info
+	const float levelLabelY = scoreValueY + layout.cellSize * 2;
+
+	layout.levelLabel = { leftSideXMin, levelLabelY, panelSize, panelSize };
+
+	const float levelValueY = levelLabelY + layout.cellSize * 1.5f;
+
+	layout.level = { leftSideXMin, levelValueY, panelSize, panelSize };
+
+	// Lines info
+	const float linesLabelY = levelValueY + layout.cellSize * 2;
+
+	layout.linesLabel = { leftSideXMin, linesLabelY, panelSize, panelSize };
+
+	const float linesValueY = linesLabelY + layout.cellSize * 1.5f;
+
+	layout.lines = { leftSideXMin, linesValueY, panelSize, panelSize };
+
 
 	return layout;
 }

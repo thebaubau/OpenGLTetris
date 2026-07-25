@@ -59,7 +59,7 @@ void TextRenderer::SetupFont(const std::string& path)
     //    std::cout << "ERROR::FREETYTPE: Failed to set Char Size" << std::endl;
     //}
 
-    FT_Set_Pixel_Sizes(face, 0, 32);
+    FT_Set_Pixel_Sizes(face, 0, FONT_PIXEL_SIZE);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // disable byte-alignment restriction
 
@@ -95,6 +95,20 @@ void TextRenderer::SetupFont(const std::string& path)
     FT_Done_FreeType(ftLib);
 }
 
+void TextRenderer::RenderTextCentered(Shader& s, const std::string& text, const Rect& rect, float scale, glm::vec3 color, const glm::mat4& projection)
+{
+    float width = 0.0f;
+    for (char c : text)
+    {
+        Character ch = m_Characters[c];
+        width += (ch.Advance >> 6) * scale;
+    }
+
+    float originX = rect.x + (rect.w - width) * 0.5f;
+
+    RenderText(s, text, originX, rect.y, scale, color, projection);
+}
+
 void TextRenderer::RenderText(Shader& s, const std::string& text, float x, float y, float scale, glm::vec3 color, const glm::mat4& projection)
 {
     s.Bind();
@@ -109,7 +123,7 @@ void TextRenderer::RenderText(Shader& s, const std::string& text, float x, float
     for (c = text.begin(); c != text.end(); c++)
     {
         Character ch = m_Characters[*c];
-
+        
         float xpos = x + ch.Bearing.x * scale;
         float ypos = y - ch.Bearing.y * scale;
 

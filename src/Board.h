@@ -31,12 +31,36 @@ public:
 	std::unique_ptr<Tetromino> m_NextTetromino;
 
 	int m_SpawnPostion[2] = { 0, 3 };
+	
+	float m_GameSpeed;
+	int m_Level;
+
 	int m_BoardScore = 0;
+	int m_NumOfLines = 0;
+
 	const std::map<int, int> m_Scores {
 		{ 1, 100 },
 		{ 2, 300 },
 		{ 3, 500 },
 		{ 4, 800 }
+	};
+
+	const std::vector<float> m_Speeds {
+		0.80f, // level 1
+		0.72f, // level 2
+		0.63f, // level 3
+		0.55f, // level 4
+		0.47f, // level 5
+		0.38f, // level 6
+		0.30f, // level 7
+		0.22f, // level 8
+		0.13f, // level 9
+		0.10f, // level 10
+		0.083f, // level 11
+		0.083f, // level 12
+		0.083f, // level 13
+		0.067f, // level 14
+		0.067f  // level 15
 	};
 
 	bool UpdateBoard();
@@ -49,6 +73,8 @@ public:
 	bool CanMove(TetrominoMove dir);
 	void KickIntoBounds(Tetromino& tetromino);
 	bool IntersectsWithSettled(Tetromino tetromino);
+
+	void UpdateGameSpeed();
 
 	void CheckLines();
 	void ShiftBoardDown(int row);

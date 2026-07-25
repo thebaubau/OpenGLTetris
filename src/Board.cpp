@@ -23,6 +23,8 @@ Board::Board()
 	m_Tetrominos.push_back(Tetromino(TetrominoDataLoader::LoadTetrominoData("tetromino_t.txt"), m_TetrominoTextures[6]));
 
 	m_BoardBg = std::make_unique<Texture>("res\\textures\\board_bg.jpg");
+	m_Level = 0;
+	UpdateGameSpeed();
 }
 
 Board::~Board()
@@ -242,6 +244,14 @@ bool Board::IntersectsWithSettled(Tetromino tetromino)
 	return false;
 }
 
+void Board::UpdateGameSpeed()
+{
+	if (m_Level >= (int)m_Speeds.size() - 1)
+		m_GameSpeed = m_Speeds.back();
+	else
+		m_GameSpeed = m_Speeds[m_Level];
+}
+
 void Board::CheckLines()
 {
 	int settledValue = 2;
@@ -271,7 +281,11 @@ void Board::ShiftBoardDown(int row)
 
 void Board::UpdateScore(int lines)
 {
+	m_NumOfLines += lines;
 	m_BoardScore += m_Scores.at(lines);
+
+	m_Level = m_NumOfLines / 10;
+	UpdateGameSpeed();
 }
 
 void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)

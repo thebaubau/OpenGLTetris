@@ -20,6 +20,11 @@ struct GameLayout {
 	Rect gameBg;
 	Rect nextTetromino;
 	Rect scoreLabel;
+	Rect score;
+	Rect linesLabel;
+	Rect lines;
+	Rect levelLabel;
+	Rect level;
 
 	// Pixels per block. Single source of truth: the board and the
 	// preview panel must render blocks at the same size.
@@ -34,7 +39,6 @@ public:
 
 	void Run();
 
-	int m_GameSpeed = 1;
 	GameState m_GameState;
 
 	std::unique_ptr<Board> m_Board;

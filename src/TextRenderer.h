@@ -5,6 +5,9 @@
 #include <iostream>
 #include <map>
 #include "Shader.h"
+#include "Rect.h"
+
+static constexpr int FONT_PIXEL_SIZE = 32;
 
 struct Character {
     unsigned int TextureID;  // ID handle of the glyph texture
@@ -20,6 +23,7 @@ public:
 	~TextRenderer();
 
     void RenderText(Shader& s, const std::string& text, float x, float y, float scale, glm::vec3 color, const glm::mat4& projection);
+    void RenderTextCentered(Shader& s, const std::string& text, const Rect& rect, float scale, glm::vec3 color, const glm::mat4& projection);
 private:
     std::map<char, Character> m_Characters;
     unsigned int m_VAO, m_VBO;
