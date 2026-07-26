@@ -157,6 +157,19 @@ bool Board::HandleMovement(TetrominoMove dir)
 		}
 	}
 
+	if (dir == DROP) {
+		std::cout << "Hard drop" << std::endl;
+		while (CanMove(DOWN)) {
+			m_ActiveTetromino->Move(DOWN);
+		}
+
+		LockTetromino();
+		m_ActiveTetromino->m_Active = false;
+		CheckLines();
+
+		return true;
+	}
+
 	return false;
 }
 

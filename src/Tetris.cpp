@@ -160,6 +160,12 @@ void Tetris::ProcessInput() {
 		if (HandleKeyRepeat(GLFW_KEY_DOWN, DOWN, cooldown, cooldown, currentTime))
 			m_GameTime = currentTime;
 	}
+
+	if (m_Keys[GLFW_KEY_SPACE] && !m_KeysProcessed[GLFW_KEY_SPACE]) {
+		if (m_Board->HandleMovement(DROP))
+			m_GameTime = currentTime;
+		m_KeysProcessed[GLFW_KEY_SPACE] = true;
+	}
 }
 
 void Tetris::ErrorCallback(int error, const char* description)

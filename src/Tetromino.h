@@ -10,7 +10,8 @@ enum TetrominoMove {
 	LEFT,
 	RIGHT,
 	ROTATE,
-	DOWN
+	DOWN,
+	DROP
 };
 
 class Tetromino
