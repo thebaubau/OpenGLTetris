@@ -72,6 +72,18 @@ void Board::DrawBoard() {
 	int boardRowSize = m_Board.size() - 1;
 	int boardColSize = m_Board[0].size() - 1;
 
+	int ghostRow = m_ActiveTetromino->m_RowPos + GhostDropDistance();
+
+	for (int i = 0; i < m_ActiveTetromino->m_Height; i++) {
+		for (int j = 0; j < m_ActiveTetromino->m_Width; j++) {
+			int row = ghostRow + i;
+			int col = m_ActiveTetromino->m_ColPos + j;
+			if (m_ActiveTetromino->m_TetrominoData[i][j] == 1 && col >= 0 && col <= boardColSize && row >= 0 && row <= boardRowSize && m_Board[row][col].value == 0) {
+				m_Board[row][col].value = 3;
+			}
+		}
+	}
+
 	for (int i = 0; i < m_ActiveTetromino->m_Height; i++) {
 		for (int j = 0; j < m_ActiveTetromino->m_Width; j++) {
 			if (m_ActiveTetromino->m_ColPos + j >= 0 && m_ActiveTetromino->m_ColPos + j <= boardColSize && m_ActiveTetromino->m_RowPos + i <= boardRowSize && m_ActiveTetromino->m_TetrominoData[i][j] == 1) {
@@ -159,9 +171,12 @@ bool Board::HandleMovement(TetrominoMove dir)
 
 	if (dir == DROP) {
 		std::cout << "Hard drop" << std::endl;
-		while (CanMove(DOWN)) {
+
+		int cellsDropped = GhostDropDistance();
+		for (int k = 0; k < cellsDropped; k++)
 			m_ActiveTetromino->Move(DOWN);
-		}
+
+		m_BoardScore += cellsDropped * 2;
 
 		LockTetromino();
 		m_ActiveTetromino->m_Active = false;
@@ -257,6 +272,20 @@ bool Board::IntersectsWithSettled(Tetromino tetromino)
 	return false;
 }
 
+int Board::GhostDropDistance()
+{
+	Tetromino ghost = *m_ActiveTetromino;
+
+	int distance = 0;
+	ghost.m_RowPos += 1;
+	while (!IntersectsWithSettled(ghost)) {
+		distance++;
+		ghost.m_RowPos += 1;
+	}
+
+	return distance;
+}
+
 void Board::UpdateGameSpeed()
 {
 	if (m_Level >= (int)m_Speeds.size() - 1)
@@ -317,10 +346,13 @@ void Board::Draw(SpriteRenderer& renderer, const Rect& board, float cellSize)
 		for (int j{ 0 }; j < 10; ++j) {
 			int cell = m_Board[i][j].value;
 			
-			if (cell == 1 || cell == 2) {
+			if (cell == 1 || cell == 2 || cell == 3) {
 				glm::vec2 pos = { board.x + j * cellSize, board.y + i * cellSize };
 				if (cell == 1) {
 					renderer.Draw(*m_ActiveTetromino->m_Texture, pos, { cellSize, cellSize });
+				}
+				else if (cell == 3) {
+					renderer.Draw(*m_ActiveTetromino->m_Texture, pos, { cellSize, cellSize }, 0.0f, glm::vec3(1.0f), 0.3f);
 				}
 				else {
 					renderer.Draw(*m_Board[i][j].texture, pos, {cellSize, cellSize});

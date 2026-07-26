@@ -15,6 +15,9 @@ Debug/
 Release/
 Tetris/x64/
 
+# Distributable package
+dist/
+
 # Compiled objects
 *.obj
 *.ilk

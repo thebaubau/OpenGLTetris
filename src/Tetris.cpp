@@ -25,7 +25,17 @@ Tetris::Tetris()
 		std::cerr << "Failed to load GLFW window" << std::endl;
 		glfwTerminate();
 	}
-	
+
+	// Window icon (title bar / taskbar of the running window). GLFW wants raw
+	// RGBA pixels; stb_image (already used for textures) hands them over.
+	GLFWimage icon;
+	int iconChannels;
+	icon.pixels = stbi_load("res\\icon.png", &icon.width, &icon.height, &iconChannels, 4);
+	if (icon.pixels) {
+		glfwSetWindowIcon(m_Window, 1, &icon);
+		stbi_image_free(icon.pixels);
+	}
+
 	glfwMakeContextCurrent(m_Window);
 	glfwSetFramebufferSizeCallback(m_Window, FrameBufferSizeCallback);
 

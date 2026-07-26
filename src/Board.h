@@ -20,6 +20,7 @@ struct Cell {
 // 0 = Room to move
 // 1 = Active tetromino
 // 2 = Locked tetromino
+// 3 = Ghost preview (where the active piece would hard-drop to)
 class Board
 {
 public:
@@ -73,6 +74,8 @@ public:
 	bool CanMove(TetrominoMove dir);
 	void KickIntoBounds(Tetromino& tetromino);
 	bool IntersectsWithSettled(Tetromino tetromino);
+
+	int GhostDropDistance();
 
 	void UpdateGameSpeed();
 

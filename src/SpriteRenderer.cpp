@@ -20,7 +20,7 @@ void SpriteRenderer::SetProjection(const glm::mat4& projection)
 }
 
 void SpriteRenderer::Draw(Texture& texture, glm::vec2 position, glm::vec2 size,
-                          float rotate, glm::vec3 color)
+                          float rotate, glm::vec3 color, float alpha)
 {
 	m_Shader.Bind();
 
@@ -36,6 +36,7 @@ void SpriteRenderer::Draw(Texture& texture, glm::vec2 position, glm::vec2 size,
 
 	m_Shader.SetMat4("model", model);
 	m_Shader.SetVec3("spriteColor", color);
+	m_Shader.SetFloat("spriteAlpha", alpha);
 
 	texture.Bind(0);
 
